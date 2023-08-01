@@ -14,7 +14,7 @@ import { Media } from './media/entities/media.entity';
       type: 'postgres',
       host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
-      username: String(process.env.DB_USERNAME),
+      username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       entities: [Userdg, Platform, Media],
