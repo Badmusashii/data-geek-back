@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserdgModule } from './userdg/userdg.module';
 
 import * as dotenv from 'dotenv';
 
@@ -19,6 +20,7 @@ dotenv.config({ path: '.env' });
       entities: [],
       synchronize: true,
     }),
+    UserdgModule,
   ],
   controllers: [AppController],
   providers: [AppService],
