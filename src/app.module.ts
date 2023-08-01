@@ -26,4 +26,15 @@ import { Media } from './media/entities/media.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('TypeORM config:', {
+      type: 'postgres',
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    });
+  }
+}
