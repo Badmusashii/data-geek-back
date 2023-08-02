@@ -22,7 +22,7 @@ export class MediaService {
   }
 
   async findOne(id: number): Promise<Media> {
-    const media = await this.mediaRepository.findOne({ id: id });
+    const media = await this.mediaRepository.findOne({ where: { id: id } });
     if (!media) throw new NotFoundException(`Le titre ${id} est introuvable`);
     return media;
   }
@@ -33,8 +33,9 @@ export class MediaService {
     return await this.mediaRepository.save(media);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<{ message: string }> {
     const media = await this.findOne(id);
     await this.mediaRepository.remove(media);
+    return { message: `Le titre avec l'ID ${id} à bien été supprimé !` };
   }
 }
