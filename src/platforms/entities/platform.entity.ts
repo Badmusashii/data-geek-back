@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Media } from 'src/media/entities/media.entity';
+import { Userdg } from 'src/userdg/entities/userdg.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('platforms')
 export class Platform {
@@ -10,4 +12,10 @@ export class Platform {
 
   @Column({ length: 100, nullable: true, name: 'constructor' })
   platformConstructor: string;
+
+  @ManyToMany(() => Media, (media) => media.platforms)
+  medias: Media[];
+
+  @ManyToMany(() => Userdg, (userdg) => userdg.platforms)
+  users: Userdg[];
 }

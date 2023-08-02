@@ -26,17 +26,17 @@ export class MediaController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mediaService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.mediaService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMediaDto: UpdateMediaDto) {
-    return this.mediaService.update(+id, updateMediaDto);
+  update(@Param('id') id: number, @Body() updateMediaDto: UpdateMediaDto) {
+    return this.mediaService.update(id, updateMediaDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mediaService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.mediaService.remove(id);
   }
 }
