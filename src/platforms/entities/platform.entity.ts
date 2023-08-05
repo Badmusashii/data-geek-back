@@ -10,6 +10,9 @@ export class Platform {
   @Column({ length: 100 })
   name: string;
 
+  // @Column({ nullable: true })
+  // impagePath: string;
+
   @Column({ length: 100, nullable: true, name: 'constructor' })
   platformConstructor: string;
 

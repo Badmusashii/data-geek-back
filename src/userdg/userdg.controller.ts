@@ -8,16 +8,21 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserdgService } from './userdg.service';
-import { CreateUserdgDto } from './dto/create-userdg.dto';
+import { CreateUserdgDto, LoginUserdgDto } from './dto/create-userdg.dto';
 import { UpdateUserdgDto } from './dto/update-userdg.dto';
 
 @Controller('userdg')
 export class UserdgController {
   constructor(private readonly userdgService: UserdgService) {}
 
-  @Post()
-  create(@Body() createUserdgDto: CreateUserdgDto) {
-    return this.userdgService.create(createUserdgDto);
+  @Post('create')
+  async create(@Body() createUserdgDto: CreateUserdgDto) {
+    return this.userdgService.createUser(createUserdgDto);
+  }
+
+  @Post('login')
+  async login(@Body() loginUserdgDto: LoginUserdgDto) {
+    return this.userdgService.login(loginUserdgDto);
   }
 
   @Get()
