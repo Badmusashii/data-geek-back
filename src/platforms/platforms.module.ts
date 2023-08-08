@@ -3,10 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlatformsService } from './platforms.service';
 import { PlatformsController } from './platforms.controller';
 import { Platform } from './entities/platform.entity';
+import { MediaModule } from 'src/media/media.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Platform])],
+  imports: [TypeOrmModule.forFeature([Platform]), MediaModule],
   controllers: [PlatformsController],
-  providers: [PlatformsService, Platform],
+  providers: [PlatformsService],
 })
 export class PlatformsModule {}
