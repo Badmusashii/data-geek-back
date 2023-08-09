@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { Media } from './entities/media.entity';
+import { GiantBombService } from 'src/services/giant-bomb/giant-bomb.service';
 
 @Injectable()
 export class MediaService {
   constructor(
     @InjectRepository(Media)
     private readonly mediaRepository: Repository<Media>,
+    private readonly giantBomb: GiantBombService,
   ) {}
 
   async create(createMediaDto: CreateMediaDto): Promise<Media> {
@@ -37,5 +39,16 @@ export class MediaService {
     const media = await this.findOne(id);
     await this.mediaRepository.remove(media);
     return { message: `Le titre avec l'ID ${id} à bien été supprimé !` };
+  }
+  async findMediaByTitle(title: string) {
+    const media = await this.mediaRepository.findOne({ where: { title } });
+
+    if (!media) {
+      const giantbombData = await this.giantBomb.searchGame(title);
+      // Traitez les données reçues si nécessaire
+      return giantbombData;
+    }
+
+    return media;
   }
 }

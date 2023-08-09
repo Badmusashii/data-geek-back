@@ -10,6 +10,7 @@ import * as dotenv from 'dotenv';
 import { Userdg } from './userdg/entities/userdg.entity';
 import { Platform } from './platforms/entities/platform.entity';
 import { Media } from './media/entities/media.entity';
+import { GiantBombService } from './services/giant-bomb/giant-bomb.service';
 
 dotenv.config({ path: '.env' });
 
@@ -31,7 +32,7 @@ dotenv.config({ path: '.env' });
     MediaModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GiantBombService],
 })
 export class AppModule {
   constructor() {
