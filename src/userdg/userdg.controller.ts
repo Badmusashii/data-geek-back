@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { UserdgService } from './userdg.service';
 import { CreateUserdgDto, LoginUserdgDto } from './dto/create-userdg.dto';
 import { UpdateUserdgDto } from './dto/update-userdg.dto';
+import { HttpStatusCode } from 'axios';
 
 @Controller('userdg')
 export class UserdgController {
@@ -21,6 +23,7 @@ export class UserdgController {
   }
 
   @Post('login')
+  @HttpCode(200)
   async login(@Body() loginUserdgDto: LoginUserdgDto) {
     return this.userdgService.login(loginUserdgDto);
   }

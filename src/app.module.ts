@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserdgModule } from './userdg/userdg.module';
 import { PlatformsModule } from './platforms/platforms.module';
 import { MediaModule } from './media/media.module';
-
 import * as dotenv from 'dotenv';
 import { Userdg } from './userdg/entities/userdg.entity';
 import { Platform } from './platforms/entities/platform.entity';
@@ -33,7 +32,7 @@ dotenv.config({ path: '.env' });
     MediaModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GiantBombService, MoviedatabaseService],
+  providers: [AppService, MoviedatabaseService, GiantBombService],
 })
 export class AppModule {
   constructor() {

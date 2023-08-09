@@ -28,14 +28,14 @@ export class UserdgService {
     return await this.userRepository.save(user);
   }
 
-  async login(loginUserDto: LoginUserdgDto): Promise<string> {
+  async login(loginUserDto: LoginUserdgDto): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({
       where: { username: loginUserDto.username },
     });
 
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       // Le mot de passe correspond
-      return 'Succès !'; // Vous devriez probablement retourner un JWT ou un autre jeton ici
+      return { message: 'Succès !' }; // Vous devriez probablement retourner un JWT ou un autre jeton ici
     } else {
       throw new UnauthorizedException('Identifiants incorrects.');
     }
