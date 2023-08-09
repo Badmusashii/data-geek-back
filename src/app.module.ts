@@ -11,6 +11,7 @@ import { Userdg } from './userdg/entities/userdg.entity';
 import { Platform } from './platforms/entities/platform.entity';
 import { Media } from './media/entities/media.entity';
 import { GiantBombService } from './services/giant-bomb/giant-bomb.service';
+import { MoviedatabaseService } from './services/moviedatabase/moviedatabase.service';
 
 dotenv.config({ path: '.env' });
 
@@ -32,7 +33,7 @@ dotenv.config({ path: '.env' });
     MediaModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GiantBombService],
+  providers: [AppService, GiantBombService, MoviedatabaseService],
 })
 export class AppModule {
   constructor() {

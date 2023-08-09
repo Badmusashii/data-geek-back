@@ -29,9 +29,12 @@ export class MediaController {
   findOne(@Param('id') id: number) {
     return this.mediaService.findOne(id);
   }
-  @Get('search/:title')
-  async searchMedia(@Param('title') title: string) {
-    return this.mediaService.findMediaByTitle(title);
+  @Get('search/:title/:platformId')
+  async searchMedia(
+    @Param('title') title: string,
+    @Param('platformId') platformId: number,
+  ) {
+    return this.mediaService.findMediaByTitle(title, platformId);
   }
 
   @Patch(':id')
