@@ -11,6 +11,7 @@ import { Platform } from './platforms/entities/platform.entity';
 import { Media } from './media/entities/media.entity';
 import { GiantBombService } from './services/giant-bomb/giant-bomb.service';
 import { MoviedatabaseService } from './services/moviedatabase/moviedatabase.service';
+import { AuthModule } from './services/auth/auth.module';
 
 dotenv.config({ path: '.env' });
 
@@ -30,6 +31,7 @@ dotenv.config({ path: '.env' });
     UserdgModule,
     PlatformsModule,
     MediaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, MoviedatabaseService, GiantBombService],
@@ -44,5 +46,6 @@ export class AppModule {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
     });
+    console.log('ACCESS TOKEN : ', process.env.ACCESS_TOKEN_SECRET);
   }
 }

@@ -5,12 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Userdg } from './entities/userdg.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserdgService {
   constructor(
     @InjectRepository(Userdg)
     private readonly userRepository: Repository<Userdg>,
+    private jwtService: JwtService,
   ) {}
 
   // create(createUserdgDto: CreateUserdgDto) {
@@ -28,14 +30,15 @@ export class UserdgService {
     return await this.userRepository.save(user);
   }
 
-  async login(loginUserDto: LoginUserdgDto): Promise<{ message: string }> {
+  async login(loginUserDto: LoginUserdgDto): Promise<{ accessToken: string }> {
     const user = await this.userRepository.findOne({
       where: { username: loginUserDto.username },
     });
 
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       // Le mot de passe correspond
-      return { message: 'Succès !' }; // Vous devriez probablement retourner un JWT ou un autre jeton ici
+      const payload = { username: user.username, sub: user.id };
+      return { accessToken: this.jwtService.sign(payload) }; // Vous devriez probablement retourner un JWT ou un autre jeton ici
     } else {
       throw new UnauthorizedException('Identifiants incorrects.');
     }
