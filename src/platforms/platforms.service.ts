@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Platform } from './entities/platform.entity';
 import { Media } from 'src/media/entities/media.entity';
+import { Userdg } from 'src/userdg/entities/userdg.entity';
 
 @Injectable()
 export class PlatformsService {
@@ -14,6 +15,8 @@ export class PlatformsService {
     private platformsRepository: Repository<Platform>,
     @InjectRepository(Media)
     private mediaRepository: Repository<Media>,
+    @InjectRepository(Userdg)
+    private userRepository: Repository<Userdg>,
   ) {
     this.initializePlatforms();
   }
@@ -50,7 +53,31 @@ export class PlatformsService {
     }
     return platform.medias;
   }
-  async addMediaToPlatform(platformId: number, mediaData: any): Promise<Media> {
+
+  // async addMediaToPlatform(platformId: number, mediaData: any): Promise<Media> {
+  //   const platform = await this.platformsRepository.findOneOrFail({
+  //     where: { id: platformId },
+  //   });
+
+  //   if (!platform) {
+  //     throw new NotFoundException(`Platform with ID ${platformId} not found`);
+  //   }
+
+  //   // const newMedia: Media = this.mediaRepository.create(mediaData);
+  //   const newMedia = new Media();
+  //   Object.assign(newMedia, mediaData);
+
+  //   if (!newMedia.platforms) newMedia.platforms = [];
+  //   newMedia.platforms.push(platform); // Associating platform to media
+
+  //   return this.mediaRepository.save(newMedia); // Saving media also saves the association in the junction table
+  // }
+
+  async addMediaToUserAndPlatform(
+    userId: number,
+    platformId: number,
+    mediaData: any,
+  ): Promise<Media> {
     const platform = await this.platformsRepository.findOneOrFail({
       where: { id: platformId },
     });
@@ -59,12 +86,23 @@ export class PlatformsService {
       throw new NotFoundException(`Platform with ID ${platformId} not found`);
     }
 
+    const user = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
     // const newMedia: Media = this.mediaRepository.create(mediaData);
     const newMedia = new Media();
     Object.assign(newMedia, mediaData);
 
     if (!newMedia.platforms) newMedia.platforms = [];
     newMedia.platforms.push(platform); // Associating platform to media
+
+    if (!newMedia.users) newMedia.users = [];
+    newMedia.users.push(user); // Associating user to media
 
     return this.mediaRepository.save(newMedia); // Saving media also saves the association in the junction table
   }
