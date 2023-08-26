@@ -4,6 +4,7 @@ import { UserdgController } from './userdg.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Userdg } from './entities/userdg.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from 'src/services/auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
       secret: String(process.env.ACCESS_TOKEN_SECRET),
       signOptions: { expiresIn: '2h' },
     }),
+    AuthModule,
   ],
   controllers: [UserdgController],
   providers: [UserdgService],

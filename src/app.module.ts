@@ -12,6 +12,8 @@ import { Media } from './media/entities/media.entity';
 import { GiantBombService } from './services/giant-bomb/giant-bomb.service';
 import { MoviedatabaseService } from './services/moviedatabase/moviedatabase.service';
 import { AuthModule } from './services/auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './services/auth/jwt.strategy';
 
 dotenv.config({ path: '.env' });
 
@@ -32,9 +34,10 @@ dotenv.config({ path: '.env' });
     PlatformsModule,
     MediaModule,
     AuthModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AppController],
-  providers: [AppService, MoviedatabaseService, GiantBombService],
+  providers: [AppService, MoviedatabaseService, GiantBombService, JwtStrategy],
 })
 export class AppModule {
   constructor() {

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserdgDto, LoginUserdgDto } from './dto/create-userdg.dto';
 import { UpdateUserdgDto } from './dto/update-userdg.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -52,8 +56,30 @@ export class UserdgService {
     return `This action returns a #${id} userdg`;
   }
 
-  update(id: number, updateUserdgDto: UpdateUserdgDto) {
-    return `This action updates a #${id} userdg`;
+  // update(id: number, updateUserdgDto: UpdateUserdgDto) {
+  //   return `This action updates a #${id} userdg`;
+  // }
+
+  async update(id: number, updateUserdgDto: UpdateUserdgDto): Promise<Userdg> {
+    let user = await this.userRepository.findOne(id as any);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (updateUserdgDto.password) {
+      updateUserdgDto.password = await bcrypt.hash(
+        updateUserdgDto.password,
+        10,
+      );
+    } else {
+      delete updateUserdgDto.password;
+    }
+
+    await this.userRepository.update(id, updateUserdgDto);
+
+    user = await this.userRepository.findOne(id as any);
+    return user;
   }
 
   remove(id: number) {

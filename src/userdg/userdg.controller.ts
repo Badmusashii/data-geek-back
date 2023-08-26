@@ -7,10 +7,16 @@ import {
   Param,
   Delete,
   HttpCode,
+  UseGuards,
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { UserdgService } from './userdg.service';
 import { CreateUserdgDto, LoginUserdgDto } from './dto/create-userdg.dto';
 import { UpdateUserdgDto } from './dto/update-userdg.dto';
+import { JwtAuthGuard } from 'src/services/auth/jwt-auth.guard';
 import { HttpStatusCode } from 'axios';
 
 @Controller('userdg')
@@ -38,9 +44,40 @@ export class UserdgController {
     return this.userdgService.findOne(+id);
   }
 
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserdgDto: UpdateUserdgDto) {
+  //   return this.userdgService.update(+id, updateUserdgDto);
+  // }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserdgDto: UpdateUserdgDto) {
-    return this.userdgService.update(+id, updateUserdgDto);
+  async update(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() updateUserdgDto: UpdateUserdgDto,
+  ) {
+    if (isNaN(+id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+
+    // Vérifiez que l'utilisateur tente de mettre à jour son propre ID
+    if (+id !== req.user.userId) {
+      // Notez le changement ici
+      throw new ForbiddenException(
+        'Vous ne pouvez modifier que votre propre compte',
+      );
+    }
+
+    const updatedUser = await this.userdgService.update(+id, updateUserdgDto);
+
+    if (!updatedUser) {
+      throw new NotFoundException(`L'utilisateur numero ${id} est introuvable`);
+    }
+
+    return {
+      message: 'Mise à jour réussie',
+      data: updatedUser,
+    };
   }
 
   @Delete(':id')

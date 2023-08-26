@@ -34,14 +34,15 @@ export class PlatformsController {
   //   return this.platformsService.addMediaToPlatform(platformId, mediaData);
   // }
 
-  @UseGuards(AuthGuard())
+  // @UseGuards(AuthGuard('jwt'))
   @Post(':platformId/medias')
   addMediaToUserAndPlatform(
     @Request() req,
     @Param('platformId') platformId: number,
     @Body() mediaData: any,
   ) {
-    const userId = req.user.id;
+    // const userId = req.user.id;
+    const userId = 1;
     return this.platformsService.addMediaToUserAndPlatform(
       userId,
       platformId,
