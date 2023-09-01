@@ -34,15 +34,22 @@ export class PlatformsController {
   //   return this.platformsService.addMediaToPlatform(platformId, mediaData);
   // }
 
-  // @UseGuards(AuthGuard('jwt'))
   @Post(':platformId/medias')
+  @UseGuards(AuthGuard('jwt'))
   addMediaToUserAndPlatform(
     @Request() req,
     @Param('platformId') platformId: number,
-    @Body() mediaData: any,
+    @Body() body: any,
   ) {
+    // console.log('Payload recu' + JSON.stringify(mediaData));
     // const userId = req.user.id;
-    const userId = 1;
+    const mediaData = body.mediaData;
+    const userId = req.user.id;
+    // mediaData = mediaData.title;
+    console.log(JSON.stringify(req.user, null, 2));
+    console.log('userdg id : ' + userId);
+    console.log('platform ID : ' + platformId);
+    console.log('le media : ' + mediaData.title);
     return this.platformsService.addMediaToUserAndPlatform(
       userId,
       platformId,

@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -15,38 +17,37 @@ import { JwtService } from '@nestjs/jwt';
 export class UserdgService {
   constructor(
     @InjectRepository(Userdg)
-    private readonly userRepository: Repository<Userdg>,
-    private jwtService: JwtService,
+    private readonly userdgRepository: Repository<Userdg>, // private jwtService: JwtService,
   ) {}
 
   // create(createUserdgDto: CreateUserdgDto) {
   //   return 'This action adds a new userdg';
   // }
 
-  async createUser(createUserDto: CreateUserdgDto): Promise<Userdg> {
-    const user = new Userdg();
-    user.username = createUserDto.username;
-    user.name = createUserDto.name;
-    user.surname = createUserDto.surname;
-    user.email = createUserDto.email;
-    user.password = await bcrypt.hash(createUserDto.password, 10); // Le "10" est le nombre de tours de salage
+  // async createUser(createUserDto: CreateUserdgDto): Promise<Userdg> {
+  //   const user = new Userdg();
+  //   user.username = createUserDto.username;
+  //   user.name = createUserDto.name;
+  //   user.surname = createUserDto.surname;
+  //   user.email = createUserDto.email;
+  //   user.password = await bcrypt.hash(createUserDto.password, 10); // Le "10" est le nombre de tours de salage
 
-    return await this.userRepository.save(user);
-  }
+  //   return await this.userRepository.save(user);
+  // }
 
-  async login(loginUserDto: LoginUserdgDto): Promise<{ accessToken: string }> {
-    const user = await this.userRepository.findOne({
-      where: { username: loginUserDto.username },
-    });
+  // async login(loginUserDto: LoginUserdgDto): Promise<{ accessToken: string }> {
+  //   const user = await this.userRepository.findOne({
+  //     where: { username: loginUserDto.username },
+  //   });
 
-    if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
-      // Le mot de passe correspond
-      const payload = { username: user.username, sub: user.id };
-      return { accessToken: this.jwtService.sign(payload) }; // Vous devriez probablement retourner un JWT ou un autre jeton ici
-    } else {
-      throw new UnauthorizedException('Identifiants incorrects.');
-    }
-  }
+  //   if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
+  //     // Le mot de passe correspond
+  //     const payload = { username: user.username, sub: user.id };
+  //     return { accessToken: this.jwtService.sign(payload) }; // Vous devriez probablement retourner un JWT ou un autre jeton ici
+  //   } else {
+  //     throw new UnauthorizedException('Identifiants incorrects.');
+  //   }
+  // }
 
   findAll() {
     return `This action returns all userdg`;
@@ -60,29 +61,75 @@ export class UserdgService {
   //   return `This action updates a #${id} userdg`;
   // }
 
-  async update(id: number, updateUserdgDto: UpdateUserdgDto): Promise<Userdg> {
-    let user = await this.userRepository.findOne(id as any);
+  // async update(id: number, updateUserdgDto: UpdateUserdgDto): Promise<Userdg> {
+  //   let user = await this.userRepository.findOne({ where: { id } });
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+  //   if (!user) {
+  //     throw new NotFoundException(`User with ID ${id} not found`);
+  //   }
+
+  //   if (updateUserdgDto.password) {
+  //     updateUserdgDto.password = await bcrypt.hash(
+  //       updateUserdgDto.password,
+  //       10,
+  //     );
+  //   } else {
+  //     delete updateUserdgDto.password;
+  //   }
+
+  //   await this.userRepository.update(id, updateUserdgDto);
+
+  //   user = await this.userRepository.findOne(id as any);
+  //   return user;
+  // }
+
+  async update(
+    id: number,
+    currentPassword: string,
+    updateUserdgDto: UpdateUserdgDto,
+  ): Promise<Userdg> {
+    const userdg = await this.userdgRepository.findOne({ where: { id } });
+
+    if (!userdg) {
+      throw new HttpException(
+        `Le membre est introuvable`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isPasswordMatching = await this.verifyPassword(
+      currentPassword,
+      userdg.password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new HttpException('Mot de passe incorrect', HttpStatus.BAD_REQUEST);
     }
 
     if (updateUserdgDto.password) {
+      const saltRounds = 10;
       updateUserdgDto.password = await bcrypt.hash(
         updateUserdgDto.password,
-        10,
+        saltRounds,
       );
-    } else {
-      delete updateUserdgDto.password;
     }
 
-    await this.userRepository.update(id, updateUserdgDto);
+    const updateMember = await this.userdgRepository.save({
+      ...userdg,
+      ...updateUserdgDto,
+    });
 
-    user = await this.userRepository.findOne(id as any);
-    return user;
+    return updateMember;
   }
 
   remove(id: number) {
     return `This action removes a #${id} userdg`;
+  }
+
+  private async verifyPassword(
+    plainTextPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(plainTextPassword, hashedPassword);
   }
 }

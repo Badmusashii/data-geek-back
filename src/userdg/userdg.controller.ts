@@ -12,27 +12,37 @@ import {
   ForbiddenException,
   NotFoundException,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserdgService } from './userdg.service';
 import { CreateUserdgDto, LoginUserdgDto } from './dto/create-userdg.dto';
 import { UpdateUserdgDto } from './dto/update-userdg.dto';
-import { JwtAuthGuard } from 'src/services/auth/jwt-auth.guard';
+// import { JwtAuthGuard } from 'src/services/auth/jwt-auth.guard';
 import { HttpStatusCode } from 'axios';
+import { AuthGuard } from '@nestjs/passport';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Userdg } from './entities/userdg.entity';
+import * as bcrypt from 'bcrypt';
 
 @Controller('userdg')
 export class UserdgController {
-  constructor(private readonly userdgService: UserdgService) {}
+  constructor(
+    private readonly userdgService: UserdgService,
+    @InjectRepository(Userdg) private userdgRepository: Repository<Userdg>,
+  ) {}
 
-  @Post('create')
-  async create(@Body() createUserdgDto: CreateUserdgDto) {
-    return this.userdgService.createUser(createUserdgDto);
-  }
+  // @Post('create')
+  // async create(@Body() createUserdgDto: CreateUserdgDto) {
+  //   return this.userdgService.createUser(createUserdgDto);
+  // }
 
-  @Post('login')
-  @HttpCode(200)
-  async login(@Body() loginUserdgDto: LoginUserdgDto) {
-    return this.userdgService.login(loginUserdgDto);
-  }
+  // @Post('login')
+  // @HttpCode(200)
+  // async login(@Body() loginUserdgDto: LoginUserdgDto) {
+  //   return this.userdgService.login(loginUserdgDto);
+  // }
 
   @Get()
   findAll() {
@@ -44,40 +54,15 @@ export class UserdgController {
     return this.userdgService.findOne(+id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserdgDto: UpdateUserdgDto) {
-  //   return this.userdgService.update(+id, updateUserdgDto);
-  // }
-
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async update(
-    @Request() req,
-    @Param('id') id: string,
-    @Body() updateUserdgDto: UpdateUserdgDto,
-  ) {
-    if (isNaN(+id)) {
-      throw new BadRequestException('Invalid ID format');
-    }
-
+  @UseGuards(AuthGuard('jwt'))
+  update(@Param('id') id: string, @Body() updateUserdgDto: UpdateUserdgDto) {
     // Vérifiez que l'utilisateur tente de mettre à jour son propre ID
-    if (+id !== req.user.userId) {
-      // Notez le changement ici
-      throw new ForbiddenException(
-        'Vous ne pouvez modifier que votre propre compte',
-      );
-    }
-
-    const updatedUser = await this.userdgService.update(+id, updateUserdgDto);
-
-    if (!updatedUser) {
-      throw new NotFoundException(`L'utilisateur numero ${id} est introuvable`);
-    }
-
-    return {
-      message: 'Mise à jour réussie',
-      data: updatedUser,
-    };
+    return this.userdgService.update(
+      +id,
+      updateUserdgDto.currentPassword,
+      updateUserdgDto,
+    );
   }
 
   @Delete(':id')

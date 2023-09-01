@@ -78,6 +78,8 @@ export class PlatformsService {
     platformId: number,
     mediaData: any,
   ): Promise<Media> {
+    console.log('mediaData recu dans le service back' + mediaData);
+    // const newMedia = new Media()
     const platform = await this.platformsRepository.findOneOrFail({
       where: { id: platformId },
     });

@@ -19,6 +19,7 @@ dotenv.config({ path: '.env' });
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Userdg]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
