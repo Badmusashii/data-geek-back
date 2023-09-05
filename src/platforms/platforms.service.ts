@@ -108,4 +108,23 @@ export class PlatformsService {
 
     return this.mediaRepository.save(newMedia); // Saving media also saves the association in the junction table
   }
+
+  async assignUserToPlatform(
+    userdgId: number,
+    platformId: number,
+  ): Promise<void> {
+    const userdg = await this.userRepository.findOne({
+      where: { id: userdgId },
+      relations: ['platforms'],
+    });
+    const platform = await this.platformsRepository.findOne({
+      where: { id: platformId },
+    });
+    if (!userdg || !platform) {
+      throw new NotFoundException('Utilisateur ou platforme introuvable');
+    }
+    userdg.platforms = [...(userdg.platforms || []), platform];
+
+    await this.userRepository.save(userdg);
+  }
 }

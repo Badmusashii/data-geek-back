@@ -14,12 +14,13 @@ import { MoviedatabaseService } from './services/moviedatabase/moviedatabase.ser
 import { AuthModule } from './services/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './services/auth/jwt.strategy';
+import { DatageekService } from './services/datageek/datageek.service';
 
 dotenv.config({ path: '.env' });
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Userdg]),
+    TypeOrmModule.forFeature([Userdg, Platform]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -38,7 +39,13 @@ dotenv.config({ path: '.env' });
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AppController],
-  providers: [AppService, MoviedatabaseService, GiantBombService, JwtStrategy],
+  providers: [
+    AppService,
+    MoviedatabaseService,
+    GiantBombService,
+    JwtStrategy,
+    DatageekService,
+  ],
 })
 export class AppModule {
   constructor() {
