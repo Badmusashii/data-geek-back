@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Userdg } from 'src/userdg/entities/userdg.entity';
 import { Platform } from 'src/platforms/entities/platform.entity';
-import { platform } from 'os';
 
 @Injectable()
 export class DatageekService {

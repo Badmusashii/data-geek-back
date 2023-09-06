@@ -56,4 +56,22 @@ export class PlatformsController {
       mediaData,
     );
   }
+  // Dans platforms.controller.ts
+  // @Post('savePlatformStates')
+  // @UseGuards(AuthGuard('jwt')) // si vous voulez sécuriser cette route
+  // async savePlatformStates(@Body() states: any) {
+  //   return this.platformsService.savePlatformStates(states);
+  // }
+  @Post('assignUserToPlatform')
+  @UseGuards(AuthGuard('jwt')) // si vous voulez sécuriser cette route
+  async assignUserToPlatform(
+    @Request() req,
+    @Body() toggleState: { platformStates: { [id: number]: boolean } },
+  ) {
+    const userdgId = req.user.id;
+    // console.log("l'id user est " + userdgId);
+    // console.log("le type de l'id est " + typeof userdgId);
+    // console.log('les toggles sont' + JSON.stringify(toggleState));
+    return this.platformsService.assignUserToPlatform(userdgId, toggleState);
+  }
 }

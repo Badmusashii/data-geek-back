@@ -3,10 +3,11 @@ import { PLATFORMS } from './platforms.constants';
 import { CreatePlatformDto } from './dto/create-platform.dto';
 import { UpdatePlatformDto } from './dto/update-platform.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Platform } from './entities/platform.entity';
 import { Media } from 'src/media/entities/media.entity';
 import { Userdg } from 'src/userdg/entities/userdg.entity';
+import { platform } from 'os';
 
 @Injectable()
 export class PlatformsService {
@@ -109,21 +110,49 @@ export class PlatformsService {
     return this.mediaRepository.save(newMedia); // Saving media also saves the association in the junction table
   }
 
+  // Dans platforms.service.ts
+  async savePlatformStates(states: any): Promise<any> {
+    // Ici, vous pouvez sauvegarder les états des toggles en base de données
+    // ou effectuer toute autre opération nécessaire.
+    return this.platformsRepository.save(states); // Exemple
+  }
+
   async assignUserToPlatform(
     userdgId: number,
-    platformId: number,
+    // platformId: number,
+    toggleState: { platformStates: { [id: number]: boolean } },
   ): Promise<void> {
+    console.log('toggle recu dans le service ' + JSON.stringify(toggleState));
     const userdg = await this.userRepository.findOne({
       where: { id: userdgId },
       relations: ['platforms'],
     });
-    const platform = await this.platformsRepository.findOne({
-      where: { id: platformId },
+    // const platform = await this.platformsRepository.findOne({
+    //   where: { id: platformId },
+    // });
+    // const platformStates = toggleState.platformStates || {};
+    const platformStates = toggleState.platformStates || {};
+
+    const platformIds = Object.keys(platformStates).map((key) => {
+      return +key;
     });
-    if (!userdg || !platform) {
+    // console.log('les platforms ids cote back sont => ' + platformIds);
+    const platforms = await this.platformsRepository.find({
+      where: {
+        id: In(platformIds),
+      },
+    });
+    if (platforms.length !== platformIds.length) {
       throw new NotFoundException('Utilisateur ou platforme introuvable');
     }
-    userdg.platforms = [...(userdg.platforms || []), platform];
+    userdg.platforms = platforms.filter(
+      (platform) => platformStates[platform.id],
+    );
+    // if (toggleState) {
+    //   userdg.platforms = [...(userdg.platforms || []), platform];
+    // } else {
+    //   userdg.platforms = userdg.platforms.filter((p) => p.id !== platform.id);
+    // }
 
     await this.userRepository.save(userdg);
   }
